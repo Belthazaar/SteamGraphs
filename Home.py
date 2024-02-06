@@ -1,15 +1,10 @@
 
 import streamlit as st
 import streamlit.components.v1 as components
-import mpld3
 import pandas as pd
 from pymongo import MongoClient
 import datetime
-import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter, HourLocator
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
 st.set_page_config(page_title="Steam Cache Monitor", page_icon=":video_game:", layout="wide")

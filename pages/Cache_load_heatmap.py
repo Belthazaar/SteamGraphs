@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import datetime
 from pymongo import MongoClient
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
 cm_cache_detail = [
