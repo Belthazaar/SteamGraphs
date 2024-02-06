@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-st.set_page_config(page_title="Steam cache load per cirt", page_icon=":video_game:", layout="wide")
+st.set_page_config(page_title="Steam cache load per city", page_icon=":video_game:", layout="wide")
 
 cm_cache_detail = [
     {'region': 'South America', 'code': 'ARG', 'cm': 'eze1', 'cache': '',       'cell_id': 116, 'city': 'Buenos Aires'},
