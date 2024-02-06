@@ -4,6 +4,7 @@ import datetime
 from pymongo import MongoClient
 from plotly.subplots import make_subplots
 
+st.set_page_config(page_title="Steam cache load per region", page_icon=":video_game:", layout="wide")
 
 cm_cache_detail = [
     {'region': 'South America', 'code': 'ARG', 'cm': 'eze1', 'cache': '',       'cell_id': 116, 'city': 'Buenos Aires'},
@@ -65,20 +66,6 @@ colnames = list(all_df.columns)
 now = datetime.datetime.utcnow()
 
 @st.cache_data(ttl=1800)
-def cache_city_query(start, end, region):
-    db = client.steam
-    start = datetime.datetime.combine(start, datetime.time())
-    end = datetime.datetime.combine(end, datetime.time()) + datetime.timedelta(days=1)
-
-    items = list(db.cache.find({'region': region, 'timestamp': {"$gte": start, "$lte": end}},{'_id': 0, 'time_stamp': 0, 'rounded_timestamp': 0}))
-    df = pd.DataFrame(items)
-    df = df.groupby(['timestamp', 'query_id']).head(5)
-    df = df.groupby(['query_id', 'city']).size().unstack().fillna(0)
-    df.index = df.index.map(lambda x: cell_id_to_city[x])
-    df.sort_index(inplace=True)
-    return df
-
-@st.cache_data(ttl=1800)
 def mean_region_cache_load(start, end, region):
     db = client.steam
     start = datetime.datetime.combine(start, datetime.time())
@@ -111,12 +98,6 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
         region_traffic_filtered.sort_index(inplace=True)
         fig.add_scatter(x=filtered_df.index, y=filtered_df.mean(axis=1), mode='lines', name='Mean Cache Load')
         fig.add_scatter(x=region_traffic_filtered.index, y=region_traffic_filtered, mode='lines', name=f'Mean Traffic for {region}', secondary_y=True)
-        # fig.add_trace(trace=go.Line(x=region_traffic_filtered.index, 
-        #                             y=region_traffic_filtered, 
-        #                             mode='lines', 
-        #                             name='Mean Traffic'), 
-        #                             secondary_y=True,
-        #                             )
     else:
         fig.add_scatter(x=df.index, y=df.mean(axis=1), mode='lines', name='Mean Cache Load')
     

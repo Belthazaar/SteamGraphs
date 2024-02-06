@@ -4,6 +4,7 @@ import datetime
 from pymongo import MongoClient
 import plotly.express as px
 
+st.set_page_config(page_title="Steam cache load heatmap", page_icon=":video_game:", layout="wide")
 
 cm_cache_detail = [
     {'region': 'South_America', 'code': 'ARG', 'cm': 'eze1', 'cache': '',       'cell_id': 116, 'city': 'Buenos Aires'},

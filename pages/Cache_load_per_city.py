@@ -5,6 +5,7 @@ from pymongo import MongoClient
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+st.set_page_config(page_title="Steam cache load per cirt", page_icon=":video_game:", layout="wide")
 
 cm_cache_detail = [
     {'region': 'South America', 'code': 'ARG', 'cm': 'eze1', 'cache': '',       'cell_id': 116, 'city': 'Buenos Aires'},
@@ -66,13 +67,14 @@ def city_load(city, start, end):
     e = datetime.datetime.combine(end, datetime.time())
     caches = list(db.cache.find({"timestamp": {"$gte": s, "$lte": e}, 
                                  'city': city, 'type': 'SteamCache'}, 
-                                 {'_id': 0, 'timestamp': 1, 'host':1, 'load': 1}).sort('timestamp', -1))
+                                 {'_id': 0, 'timestamp': 1, 'host':1, 'load': 1}).sort('timestamp', 1))
     if len(caches) == 0:
         return pd.DataFrame(), [], []
     df = pd.DataFrame(caches)
     dates = df.timestamp.unique()
     hosts = list(df.host.unique())
     t_df = df.groupby(['timestamp', 'host'])['load'].mean().unstack().apply(lambda x: x.fillna((hosts.index(x.name) * 2 + 105)), axis=0)
+    t_df.sort_index(inplace=True)
     return t_df, dates, hosts
 
 
