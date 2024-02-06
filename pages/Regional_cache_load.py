@@ -89,6 +89,7 @@ def mean_regions_cache_load(start, end):
 def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=None):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     dates = df.index.unique()
+    region = region.replace(' ', '_')
     if overlay_traffic:
         region_traffic = traffic_df[region.replace(' ', '_')]
         region_traffic_filtered = region_traffic[region_traffic.index.isin(dates)]
