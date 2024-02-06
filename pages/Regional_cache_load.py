@@ -67,6 +67,7 @@ now = datetime.datetime.utcnow()
 
 @st.cache_data(ttl=1800)
 def mean_region_cache_load(start, end, region):
+    region = region.replace(' ', '_')
     db = client.steam
     start = datetime.datetime.combine(start, datetime.time())
     end = datetime.datetime.combine(end, datetime.time()) + datetime.timedelta(days=1)
@@ -89,7 +90,7 @@ def mean_regions_cache_load(start, end):
 def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=None):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     dates = df.index.unique()
-    region = region.replace(' ', '_')
+    
     if overlay_traffic:
         region_traffic = traffic_df[region.replace(' ', '_')]
         region_traffic_filtered = region_traffic[region_traffic.index.isin(dates)]
