@@ -114,7 +114,7 @@ def graph_traffic_all(df):
     fig = px.line(df, x=df.index, y=df.columns)
     st.plotly_chart(fig, use_container_width=True)
 
-st.header("All traffic data")
+st.header("Steam Download Statistics")
 all_df = pd.DataFrame(get_data())
 all_df.set_index('timestamp', inplace=True)
 all_df.sort_index(inplace=True)
@@ -131,4 +131,7 @@ with col3:
     end = st.date_input('End data', value=all_df.index[-1], min_value=all_df.index[0], max_value=all_df.index[-1])
 
 inc_global = st.toggle('Include global traffic', False)
-graph_traffic_region(all_df.loc[start:end], all_region, inc_global)
+if start > end:
+    st.error('Start date must be before end date.')
+else:
+    graph_traffic_region(all_df.loc[start:end], all_region, inc_global)
