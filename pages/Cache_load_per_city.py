@@ -1,48 +1,34 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import json
 from pymongo import MongoClient
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 st.set_page_config(page_title="Steam cache load per city", page_icon=":video_game:", layout="wide")
 
-cm_cache_detail = [
-    {'region': 'South America', 'code': 'ARG', 'cm': 'eze1', 'cache': '',       'cell_id': 116, 'city': 'Buenos Aires'},
-    {'region': 'Oceania',       'code': 'AUS', 'cm': 'syd1', 'cache': 'syd1',   'cell_id':  52, 'city': 'Sydney'},
-    {'region': 'Europe',        'code': 'AUT', 'cm': 'vie1', 'cache': 'vie1',   'cell_id':  92, 'city': 'Vienna'},
-    {'region': 'South_America', 'code': 'BRA', 'cm': 'gru1', 'cache': 'gru1',   'cell_id':  25, 'city': 'São Paulo'},
-    {'region': 'South_America', 'code': 'CHL', 'cm': 'scl1', 'cache': '',       'cell_id': 117, 'city': 'Santiago'},
-    {'region': 'Europe',        'code': 'FRA', 'cm': 'par1', 'cache': 'par1',   'cell_id':  14, 'city': 'Paris'},
-    {'region': 'Europe',        'code': 'DEU', 'cm': 'fra1', 'cache': 'fra1',   'cell_id':   5, 'city': 'Frankfurt'},
-    {'region': 'Europe',        'code': 'DEU', 'cm': 'fra2', 'cache': 'fra2',   'cell_id':   5, 'city': 'Frankfurt'},
-    {'region': 'Asia',          'code': 'HKG', 'cm': 'hkg1', 'cache': 'hkg1',   'cell_id':  33, 'city': 'Hong Kong'},
-    {'region': 'Asia',          'code': 'JPN', 'cm': 'tyo1', 'cache': 'tyo1',   'cell_id':  32, 'city': 'Tokyo'},
-    {'region': 'Asia',          'code': 'JPN', 'cm': 'tyo2', 'cache': 'tyo2',   'cell_id':  32, 'city': 'Tokyo'},
-    {'region': 'Europe',        'code': 'NLD', 'cm': 'ams1', 'cache': 'ams1',   'cell_id':  15, 'city': 'Amsterdam'},
-    {'region': 'South_America', 'code': 'PER', 'cm': 'lim1', 'cache': '',       'cell_id': 118, 'city': 'Lima'},
-    {'region': 'Europe',        'code': 'POL', 'cm': 'waw1', 'cache': 'waw1',   'cell_id':  38, 'city': 'Warsaw'},
-    {'region': 'Asia',          'code': 'SGP', 'cm': 'sgp1', 'cache': 'sgp1',   'cell_id':  35, 'city': 'Singapore'},
-    {'region': 'Asia',          'code': 'SGP', 'cm': 'sgp1', 'cache': 'reuse',  'cell_id':  35, 'city': 'Singapore'},
-    {'region': 'Africa',        'code': 'ZAF', 'cm': 'jnb1', 'cache': 'jnb1',   'cell_id':  26, 'city': 'Johannesburg'},
-    {'region': 'Asia',          'code': 'KOR', 'cm': 'seo1', 'cache': '',       'cell_id':   8, 'city': 'Seoul'},
-    {'region': 'Europe',        'code': 'ESP', 'cm': 'mad1', 'cache': 'mad1',   'cell_id':  40, 'city': 'Madrid'},
-    {'region': 'Europe',        'code': 'SWE', 'cm': 'sto1', 'cache': 'sto1',   'cell_id':  66, 'city': 'Stockholm'},
-    {'region': 'Europe',        'code': 'SWE', 'cm': 'sto2', 'cache': 'sto2',   'cell_id':  66, 'city': 'Stockholm'},
-    {'region': 'Europe',        'code': 'GBR', 'cm': 'lhr1', 'cache': 'lhr1',   'cell_id':   4, 'city': 'London'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'atl1', 'cache': 'atl1',   'cell_id':  50, 'city': 'Atlanta'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'atl2', 'cache': 'atl2',   'cell_id':  50, 'city': 'Atlanta'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'atl3', 'cache': 'atl3',   'cell_id':  50, 'city': 'Atlanta'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'atl4', 'cache': 'atl4',   'cell_id':  50, 'city': 'Atlanta'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'dfw1', 'cache': 'dfw1',   'cell_id':  65, 'city': 'Dallas/Fort Worth'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'dw1',  'cache': 'dw1',    'cell_id':  65, 'city': 'Dallas/Fort Worth'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'iad1', 'cache': 'iad1',   'cell_id':  63, 'city': 'Ashburn'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'lax1', 'cache': 'lax1',   'cell_id':  64, 'city': 'Los Angeles'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'ord1', 'cache': 'ord1',   'cell_id':   1, 'city': 'Chicago'},
-    {'region': 'North_America', 'code': 'USA', 'cm': 'sea1', 'cache': 'sea1',   'cell_id':  31, 'city': 'Seattle'}
-]
+cell_id_to_region = {}
+with open('CellMap.json', 'r', encoding='utf-8') as file:
+    cid_to_region = json.load(file)
+    cell_id_to_region = {int(k): v for k, v in cid_to_region.items()}
 
-cell_id_to_city = {x['cell_id']: x['city'] for x in cm_cache_detail}
+cm_cache_detail = [{
+        'cell_id': int(k),
+        'cm': v['cm'],
+        'cache': v['cache'],
+        'code': v['code'],
+        'region': v['region'],
+        'city': v['city']
+    } for k, v in cell_id_to_region.items()]
+
+region_to_city = {x['region']: set() for x in cm_cache_detail}
+
+for x in cm_cache_detail:
+    if x['cache'] != '':
+        region_to_city[x['region']].add(x['city'])
+
+region_to_city = {k: list(v) for k, v in region_to_city.items()}
 
 @st.cache_resource
 def init_connection():
@@ -132,10 +118,14 @@ with col2:
     start = st.date_input('Start data', value=all_df.index[-1] - datetime.timedelta(hours=48), min_value=all_df.index[0].to_pydatetime(), max_value=all_df.index[-1].to_pydatetime(), key="cache_start")
 with col3:
     end = st.date_input('End data', value=all_df.index[-1], min_value=all_df.index[0].to_pydatetime(), max_value=all_df.index[-1].to_pydatetime(), key="cache_end")
-    
+
+if start > end:
+    st.error('Start date must be before end date.')
+    st.stop()
+
 c_df, c_dates, c_hosts =  city_load(city, start, end)
 if c_df.empty:
-    st.write('No data available')
+    st.error('No data found for given timeframe')
     st.stop()
 overlay_region = st.toggle('Overlay regional traffic data', False)
 region = [c for c in cm_cache_detail if c['city'] == city][0]['region']
@@ -156,6 +146,6 @@ for i in range(10):
         region = [c for c in cm_cache_detail if c['city'] == city][0]['region']
         l_df, l_dates, l_hosts = city_load(city, start, end)
         if l_df.empty:
-            st.write('No data available')
+            st.error('No data found for given timeframe')
             st.stop()
         city_load_scatter(l_df, l_dates, l_hosts, overlay_region, region, all_df)
