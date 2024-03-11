@@ -31,7 +31,7 @@ region_to_city = {k: list(v) for k, v in region_to_city.items()}
 
 @st.cache_resource
 def init_connection():
-    
+
     return MongoClient(**st.secrets["mongo"])
 
 client = init_connection()
@@ -75,7 +75,7 @@ def mean_regions_cache_load(start, end):
 def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=None):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     dates = df.index.unique()
-    
+
     if overlay_traffic:
         region_traffic = traffic_df[region.replace(' ', '_')]
         region_traffic_filtered = region_traffic[region_traffic.index.isin(dates)]
@@ -87,7 +87,7 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
         fig.add_scatter(x=region_traffic_filtered.index, y=region_traffic_filtered, mode='lines', name=f'Mean Traffic for {region}', secondary_y=True)
     else:
         fig.add_scatter(x=df.index, y=df.mean(axis=1), mode='lines', name='Mean Cache Load')
-    
+
     fig.update_layout(
         title=f'Mean Cache Load for {region}',
         xaxis_title='Date',
@@ -106,11 +106,11 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
         ),
         height=600,
     )
-    # fig = px.line(df, x=df.index, y=df.columns)
     st.plotly_chart(fig, use_container_width=True)
 
 
 st.header("Mean Cache Load")
+cache_regions = list(x['region'].replace('_', ' ') for x in cm_cache_detail if x['cache'])
 col1, col2, col3 = st.columns(3)
 with col1:
     region = st.selectbox('Select region', cache_regions, key="mean_load_region")
@@ -132,7 +132,6 @@ with region_col:
 
 if show_all:
     st.header("Mean cache load for all regions")
-    # col1, col2, col3 = st.columns(3)
     for r in cache_regions:
         st.header('Cache Load for ' + r)
         mean_load = mean_region_cache_load(start, end, r)
