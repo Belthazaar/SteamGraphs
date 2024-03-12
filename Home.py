@@ -105,6 +105,10 @@ def graph_traffic_all(df):
     st.plotly_chart(fig, use_container_width=True)
 
 st.header("Steam Download Statistics")
+txt = "Welcome to our Steam Download Statistics page. An interactive portal for exploring Steam's download statistics as they publish [here](https://store.steampowered.com/stats/content). We gather the traffic data promoted by Steam to analyze long-term trends. The data is refreshed every 10 minutes, ensuring up-to-date information is always available."
+st.markdown(txt)
+st.markdown("For more information about this project and the data, please visit our project page [here](https://steam.iijlab.net/).")
+st.subheader("Global Traffic")
 all_df = pd.DataFrame(get_data())
 all_df.set_index('timestamp', inplace=True)
 all_df.sort_index(inplace=True)
