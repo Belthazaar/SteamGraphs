@@ -102,7 +102,7 @@ def city_load_scatter(t_df, dates, hosts, overlay_region=False, region=None, tra
 
 
 st.header('Load distribution between caches within a city')
-txt = ("This page allows you to compare the load distribution between caches within a city. Optionally, you can overlay the regional traffic data to see if there is a correlation between the cache load and the traffic in the region.\n\n")
+txt = ("This page allows you to compare the load distribution between caches within a city. When a cache is not seen for a given timestamp, it is given an artificial load above 100 to improve readability when servers are no longer available. Optionally, you can overlay the regional traffic data to see if there is a correlation between the cache load and the traffic in the region.\n\n")
 st.markdown(txt)
 st.subheader('Cache Load per City')
 all_df = pd.DataFrame(get_data())
