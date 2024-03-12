@@ -101,8 +101,10 @@ def city_load_scatter(t_df, dates, hosts, overlay_region=False, region=None, tra
     st.plotly_chart(fig, use_container_width=True)
 
 
-
-st.header('Cache Load per City')
+st.header('Load distribution between caches within a city')
+txt = ("This page allows you to compare the load distribution between caches within a city. Optionally, you can overlay the regional traffic data to see if there is a correlation between the cache load and the traffic in the region.\n\n")
+st.markdown(txt)
+st.subheader('Cache Load per City')
 all_df = pd.DataFrame(get_data())
 all_df.set_index('timestamp', inplace=True)
 all_df.sort_index(inplace=True)
