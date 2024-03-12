@@ -90,7 +90,19 @@ all_df = pd.DataFrame(get_data())
 all_df.set_index('timestamp', inplace=True)
 all_df.sort_index(inplace=True)
 
-st.header("Cache Load Heatmap")
+st.header("Load distribution of cache queries between cities")
+txt = ("This page examines how the distribution of caches varies based on the Steam client's query location, aiming to "
+       "determine Steam's load balancing practices across cities within the same region.\n\n"
+       "The X-axis of the heatmap displays the cities that query the Steam client, while the Y-axis shows the locations "
+       "of the caches. By analyzing the color intensity of the heatmap, you can determine the frequency of caches "
+       "appearing in the top 5 entries, based on the query's origin location. We organize the data by region and you "
+       "can filter it by date for detailed analysis.\n\n"
+       "During periods without significant updates or new game releases, the heatmap may appear sparse, reflecting "
+       "the Steam client’s preference for utilizing caches closest to the user. However, during times of major "
+       "updates or releases, the heatmap will show increased activity, showing Steam using multiple cache locations "
+       "for efficient load distribution.")
+st.markdown(txt)
+st.subheader("Cache Load Heatmap")
 col1, col2, col3 = st.columns(3)
 with col1:
     region = st.selectbox('Select region', set(x['region'].replace('_', ' ') for x in cm_cache_detail if x['cache'] ), key="heatmap_region", index=None)
