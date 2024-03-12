@@ -79,11 +79,9 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
     if overlay_traffic:
         region_traffic = traffic_df[region.replace(' ', '_')]
         region_traffic_filtered = region_traffic[region_traffic.index.isin(dates)]
-        overlap_dates = region_traffic_filtered.index.intersection(dates)
-        filtered_df = df[df.index.isin(overlap_dates)]
-        filtered_df.sort_index(inplace=True)
+        df.sort_index(inplace=True)
         region_traffic_filtered.sort_index(inplace=True)
-        fig.add_scatter(x=filtered_df.index, y=filtered_df.mean(axis=1), mode='lines', name='Mean Cache Load')
+        fig.add_scatter(x=df.index, y=df.mean(axis=1), mode='lines', name=f'Mean Cache load')
         fig.add_scatter(x=region_traffic_filtered.index, y=region_traffic_filtered, mode='lines', name=f'Mean Traffic for {region}', secondary_y=True)
     else:
         fig.add_scatter(x=df.index, y=df.mean(axis=1), mode='lines', name='Mean Cache Load')
@@ -93,7 +91,7 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
         xaxis_title='Date',
         yaxis_title='Cache Server load',
         xaxis_tickformat='%y-%m-%d %H',
-        yaxis_range=[0, 130],
+        yaxis_range=[0, 120],
         xaxis_range=[df.index[0], df.index[-1] + datetime.timedelta(minutes=10)],
         showlegend=True,
         legend_title_text='Hosts',
@@ -108,9 +106,12 @@ def mean_cache_load_graph(df, overlay_traffic=False, traffic_df=None, region=Non
     )
     st.plotly_chart(fig, use_container_width=True)
 
+st.header('Regional Cache Load')
+txt = "This page shows the mean cache load for a region. The mean cache load is calculated by taking the mean of the cache load for all caches in the region. When a cache is no longer available it is assumed to have a load of 100. The graph can be overlayed with the regional traffic data to see if there is a correlation between the cache load and the traffic."
+st.markdown(txt)
 
-st.header("Mean Cache Load")
-cache_regions = list(x['region'].replace('_', ' ') for x in cm_cache_detail if x['cache'])
+st.subheader("Mean Cache Load")
+cache_regions = list(set(x['region'].replace('_', ' ') for x in cm_cache_detail if x['cache']))
 col1, col2, col3 = st.columns(3)
 with col1:
     region = st.selectbox('Select region', cache_regions, key="mean_load_region")
